@@ -1,14 +1,18 @@
-CFLAGS = -c -Wall
 CC = gcc
-LIBS =  -lm 
+CFLAGS = -I
+LIBS = -lm
+TARGET = resolver
 
-all: resolver
+DEPS = $(wildcard *.h)
+src = $(wildcard *.c)
+test = $(wildcard *.c)
+obj = $(patsubst %.c,%.o,$(src)) $(patsubst %.c,%.o,$(test))
 
-resolver: main.o
-	${CC} main.o  -o resolver
+$(TARGET): $(obj) 
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
-main.o: main.c
-	${CC} ${CFLAGS} main.c
+%.o: %.c $(DEPS)
+	$(CC) -c -o $@ $< 
 
-clean:
-	rm -f *.o *~
+clean: $(obj)
+	rm -rf $(obj) $(TARGET)

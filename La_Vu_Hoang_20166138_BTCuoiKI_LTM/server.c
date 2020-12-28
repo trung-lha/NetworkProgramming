@@ -44,6 +44,7 @@ int easyList[QUES_IN_LEVER];
 int mediumList[QUES_IN_LEVER];
 int hardList[QUES_IN_LEVER];
 int easyIndex = 0, mediumIndex = 0, hardIndex = 0;
+
 // load data from text file to linked list
 node_t *load_data(char *filename)
 {
@@ -107,6 +108,8 @@ void save_list(node_t *head, char *filename)
 		fprintf(f, "%s %s %d %d\n", current->username, current->password, current->status, current->point);
 	fclose(f);
 }
+
+// Lưu lại các câu hỏi khó, dễ, trung bình vào trong 3 mảng được khai báo phía trên
 int addLeverList(int id, int lv)
 {
 	switch (lv)
@@ -128,7 +131,10 @@ int addLeverList(int id, int lv)
 	}
 	return 1;
 }
+
 void lastReq(node_t *head,char* bufff);
+
+// đọc toàn bộ dữ liệu câu hỏi ra lưu vào mảng questionList[] đã khai báo phía trên
 void readQues()
 {
 	FILE *fptr;
@@ -158,6 +164,7 @@ void readQues()
 	}
 	fclose(fptr);
 }
+
 void randomId(int *arr, int lv)
 {
 
@@ -205,6 +212,7 @@ void randomId(int *arr, int lv)
 		return;
 	}
 }
+
 Message makeQuesList()
 {
 	int easy[4];
@@ -267,6 +275,7 @@ Message makeQuesList()
 	//printf("%s",buff.content);
 	return buff;
 }
+
 int checkAnswer(char *req, char *local)
 {
 	int point = 0;
@@ -277,6 +286,7 @@ int checkAnswer(char *req, char *local)
 	}
 	return point;
 }
+
 int main(int argc, char const *argv[])
 {
 	char filename[] = "account.txt";
@@ -315,7 +325,7 @@ int main(int argc, char const *argv[])
 	server.sin_addr.s_addr = htonl(INADDR_ANY);
 	if (bind(listen_sock, (struct sockaddr *)&server, sizeof(server)) == -1)
 	{
-		perror("\nError: ");
+		perror("\nError: port number has to great than 1024");
 		return 0;
 	}
 

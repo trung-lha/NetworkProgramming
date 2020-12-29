@@ -43,7 +43,9 @@ Question questionList[QUES_NUMBER];
 int easyList[QUES_IN_LEVER];
 int mediumList[QUES_IN_LEVER];
 int hardList[QUES_IN_LEVER];
+char* headQuestion[100] = {"Câu 1: ","Câu 2: ","Câu 3: ","Câu 4: ","Câu 5: ","Câu 6: ","Câu 7: ","Câu 8: ","Câu 9: ","Câu 10: ","Câu 11: ","Câu 12: ","Câu 13: ","Câu 14: ","Câu 15: "};
 int easyIndex = 0, mediumIndex = 0, hardIndex = 0;
+Message buff;
 
 // load data from text file to linked list
 node_t *load_data(char *filename)
@@ -98,7 +100,7 @@ node_t *find_node(node_t *head, char *username)
 	return NULL;
 }
 
-// save list to text file
+// ghi đè lại toàn bộ dữ liệu về người dùng, những thay đổi về thông tin người dùng khi chạy chương trình
 void save_list(node_t *head, char *filename)
 {
 	FILE *f;
@@ -165,6 +167,14 @@ void readQues()
 	fclose(fptr);
 }
 
+int checkExitsInArray(int *arr,int check){
+	int count = sizeof(arr)/sizeof(int);
+	for (int i =0;i<count;i++){
+		if(arr[i] == check) return 1;
+	}
+	return 0;
+}
+
 void randomId(int *arr, int lv)
 {
 
@@ -213,12 +223,14 @@ void randomId(int *arr, int lv)
 	}
 }
 
+// Tạo ra bộ đề thi
 Message makeQuesList()
 {
 	int easy[4];
 	int medium[4];
 	int hard[2];
 	int i, n;
+	int numberQuestion = 0;
 	Message buff;
 	srand((int)time(0));
 	randomId(easy, 1);
@@ -227,48 +239,54 @@ Message makeQuesList()
 	for (i = 0; i < 4; i++)
 	{
 		n = easyList[easy[i]];
+		strcat(buff.content, headQuestion[numberQuestion]);
 		strcat(buff.content, questionList[n].content);
 		strcat(buff.content, "\n");
 		strcat(buff.content, questionList[n].choiceA);
-		strcat(buff.content, "\t");
+		strcat(buff.content, "\t\t");
 		strcat(buff.content, questionList[n].choiceB);
 		strcat(buff.content, "\n");
 		strcat(buff.content, questionList[n].choiceC);
-		strcat(buff.content, "\t");
+		strcat(buff.content, "\t\t");
 		strcat(buff.content, questionList[n].choiceD);
 		strcat(buff.content, "\n\n");
 		buff.answer[i] = questionList[n].answer;
-		//printf("%s\n",questionList[n].content);
+		numberQuestion+=1;
+		// printf("%s\n",questionList[n].content);
 	}
 	for (i = 0; i < 4; i++)
 	{
 		n = mediumList[medium[i]];
+		strcat(buff.content, headQuestion[numberQuestion]);
 		strcat(buff.content, questionList[n].content);
 		strcat(buff.content, "\n");
 		strcat(buff.content, questionList[n].choiceA);
-		strcat(buff.content, "\t");
+		strcat(buff.content, "\t\t");
 		strcat(buff.content, questionList[n].choiceB);
 		strcat(buff.content, "\n");
 		strcat(buff.content, questionList[n].choiceC);
-		strcat(buff.content, "\t");
+		strcat(buff.content, "\t\t");
 		strcat(buff.content, questionList[n].choiceD);
 		strcat(buff.content, "\n\n");
+		numberQuestion+=1;
 		buff.answer[i + 4] = questionList[n].answer;
 		//printf("%s\n",questionList[n].content);
 	}
 	for (i = 0; i < 2; i++)
 	{
 		n = hardList[hard[i]];
+		strcat(buff.content, headQuestion[numberQuestion]);
 		strcat(buff.content, questionList[n].content);
 		strcat(buff.content, "\n");
 		strcat(buff.content, questionList[n].choiceA);
-		strcat(buff.content, "\t");
+		strcat(buff.content, "\t\t");
 		strcat(buff.content, questionList[n].choiceB);
 		strcat(buff.content, "\n");
 		strcat(buff.content, questionList[n].choiceC);
-		strcat(buff.content, "\t");
+		strcat(buff.content, "\t\t");
 		strcat(buff.content, questionList[n].choiceD);
 		strcat(buff.content, "\n\n");
+		numberQuestion+=1;
 		//printf("%s\n",questionList[n].content);
 		buff.answer[i + 8] = questionList[n].answer;
 	}
@@ -379,7 +397,6 @@ int main(int argc, char const *argv[])
 				}
 				else
 					reply = "0"; // username not found
-
 				// echo to client
 				if (0 >= (bytes_sent = send(conn_sock, reply, strlen(reply), 0)))
 				{
@@ -403,7 +420,8 @@ int main(int argc, char const *argv[])
 					// validate password
 					if (0 == strcmp(found->password, password))
 					{
-						Message buff = makeQuesList();
+						memset(&buff, '\0', sizeof(Message));
+						buff = makeQuesList();
 						reply = buff.content;
 						//printf("Đáp án:\n%s\n", buff.answer);
 						if (0 >= (bytes_sent = send(conn_sock, reply, strlen(reply), 0)))
@@ -425,7 +443,7 @@ int main(int argc, char const *argv[])
 						strcat(bee,"/10");
 						strcat(bee,"\n\n");
 						lastReq(account_list,bee);
-						printf("%s\n",bee);
+						// printf("%s\n",bee);
 						if (0 >= (bytes_sent = send(conn_sock, bee,strlen(bee), 0)))
 						{
 							printf("\nConnection closed 6\n");
@@ -469,30 +487,36 @@ int main(int argc, char const *argv[])
 }
 void lastReq(node_t *head,char* bufff){
    node_t *current;
-   int m1=1,m2=1,m3=1;
+   int m1=0,m2=0,m3=0;
    char x1[300]={0},x2[300]={0},x3[300]={0},n[3];
+   // lấy ra số điểm 3 người có số điểm lớn nhất được lưu trong file account.txt
 	for (current = head; current; current = current->next)
 		if(current->point > m1) m1 = current->point;
 	for (current = head; current; current = current->next)
 		if(current->point > m2 && current->point < m1) m2 = current->point;
 	for (current = head; current; current = current->next)
 		if(current->point > m3 && current->point < m2) m3 = current->point;
-	strcat(x1,"\nXep hang 1:\t");
-	strcat(x2,"\nXep hang 2:\t");
-	strcat(x3,"\nXep hang 3:\t");
+	strcat(x1,"\nBảng xếp hạng hiện tại\nHạng 1:\t");
+	strcat(x2,"\nHạng 2:\t");
+	strcat(x3,"\nHạng 3:\t");
+
+	// Lấy ra tên của người dùng ứng với 3 số điểm cao nhất
 	for (current = head; current; current = current->next){
 		if(current->point == m1) {
 		strcat(x1,current->username);
-		strcat(x1,"\t");	
+		strcat(x1," | ");	
 		}else if(current->point == m2){
 		 strcat(x2,current->username);	
-		 strcat(x2,"\t");
+		 strcat(x2," | ");
 		} else if(current->point == m3){
 		 strcat(x3,current->username);
-		 strcat(x3,"\t");
+		 strcat(x3," | ");
 		}
 	}
-	
+
+	strcat(x1," với số điểm: ");
+	strcat(x2," với số điểm: ");
+	strcat(x3," với số điểm: ");
 
     snprintf(n, 3, "%d", m1);
     strcat(x1,n);
@@ -506,7 +530,7 @@ void lastReq(node_t *head,char* bufff){
     strcat(bufff,x1);
     strcat(bufff,x2);
     strcat(bufff,x3);
-    printf("%s\n",bufff);
+    // printf("%s\n",bufff);
     return ;
 
 }

@@ -48,9 +48,8 @@ int main(int argc, char const *argv[])
 	// Communicate with server
 	while (1)
 	{
-
 		// get username
-		puts("\nHãy nhập mật tên người dùng và mã bảo mật");
+		puts("\nHãy đăng nhập vào hệ thống!!\n");
 		printf("Tên người dùng: ");
 		scanf("%[^\n]%*c", username);
 		//puts(username);
@@ -74,8 +73,8 @@ int main(int argc, char const *argv[])
 		buff[bytes_received] = '\0';
 		if (0 == strcmp(buff, "0"))
 		{
-			puts("Không tìm thấy tên tài khoản,đang đóng...\n");
-			return 0;
+			puts("Không tìm thấy tên tài khoản\n");
+			continue;
 		}
 		else if (0 == strcmp(buff, "2"))
 		{
@@ -117,7 +116,7 @@ int main(int argc, char const *argv[])
 		}
 		else
 		{ // if pass is right
-			printf("\n\nĐăng nhập thành công\n%s\n câu trả lời là:\t", buff);
+			printf("\n\nĐăng nhập thành công\n=====================================\n*******  Danh sách câu hỏi  ******\n\n%s\n câu trả lời là:\t", buff);
 			scanf("%[^\n]%*c", answer);
 			Up(answer);
 			if (0 >= (bytes_sent = send(client_sock, answer, strlen(answer), 0)))

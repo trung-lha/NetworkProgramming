@@ -393,21 +393,44 @@ int main(int argc, char const *argv[])
 				// check username existence
 				if ((found = find_node(account_list, username)))
 				{
-					if (found->status == 1)
-						strcpy(reply,"1"); // username found
-					else
-						strcpy(reply, "2"); // username found but has been locked
+					if (found->status == 1){
+						strcpy(reply,"1");
+						if (0 >= (bytes_sent = send(conn_sock, reply, strlen(reply), 0)))
+						{
+							printf("\nConnection closed 2\n");
+							break;
+						}
+					}
+						 // username found
+					else{
+						strcpy(reply, "2");
+						if (0 >= (bytes_sent = send(conn_sock, reply, strlen(reply), 0)))
+						{
+							printf("\nConnection closed 2\n");
+							break;
+						}
+						continue;
+					}
+					// username found but has been locked
 				}
-				else
-					strcpy(reply, "0"); // username not found
-				// echo to client
-				if (0 >= (bytes_sent = send(conn_sock, reply, strlen(reply), 0)))
-				{
-					printf("\nConnection closed 2\n");
-					break;
-				}
-				if(strcmp(reply, "1") != 0)
+				else{
+					strcpy(reply, "0");   // username not found
+					if (0 >= (bytes_sent = send(conn_sock, reply, strlen(reply), 0)))
+					{
+						printf("\nConnection closed 2\n");
+						break;
+					}
 					continue;
+				}
+					 
+				// echo to client
+				// if (0 >= (bytes_sent = send(conn_sock, reply, strlen(reply), 0)))
+				// {
+				// 	printf("\nConnection closed 2\n");
+				// 	break;
+				// }
+				// if(strcmp(reply, "1") != 0)
+				// 	continue;
 
 				
 
@@ -426,8 +449,8 @@ int main(int argc, char const *argv[])
 					if (0 == strcmp(found->password, password))
 					{
 						Message buff = makeQuesList();
-						bzero(reply,MAX);
-						strcpy(reply, buff.content);
+						// bzero(reply,MAX);
+						reply= buff.content;
 						//printf("Đáp án:\n%s\n", buff.answer);
 						if (0 >= (bytes_sent = send(conn_sock, reply, strlen(reply), 0)))
 						{
@@ -460,12 +483,12 @@ int main(int argc, char const *argv[])
 						count++;
 						if (count == 3)
 						{
-							reply = "2";	   // wrong pass 3 times, reply 2
+							strcpy(reply, "2");	   // wrong pass 3 times, reply 2
 							found->status = 0; // then lock account
 							
 						}
 						else
-							reply = "0"; // wrong pass < 3 times, reply 0
+							strcpy(reply, "0"); // wrong pass < 3 times, reply 0
 						if (0 >= (bytes_sent = send(conn_sock, reply, strlen(reply), 0)))
 						{
 							printf("\nConnection closed 7\n");

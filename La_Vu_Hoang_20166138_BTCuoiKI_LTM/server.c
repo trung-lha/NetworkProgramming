@@ -232,6 +232,8 @@ Message makeQuesList()
 	int i, n;
 	int numberQuestion = 0;
 	Message buff;
+	bzero(buff.content,MAX);
+	bzero(buff.answer,11);
 	srand((int)time(0));
 	randomId(easy, 1);
 	randomId(medium, 2);
@@ -318,7 +320,8 @@ int main(int argc, char const *argv[])
 	}
 
 	int listen_sock, conn_sock, n;
-	char username[MAX], password[MAX], answer[11], point[3], *reply,bee[1024]={0};
+	char username[MAX], password[MAX], answer[11], point[3],bee[1024]={0};
+	char *reply=(char*)malloc(MAX*sizeof(char));
 	int bytes_sent, bytes_received;
 	struct sockaddr_in server;
 	struct sockaddr_in client;
@@ -391,18 +394,20 @@ int main(int argc, char const *argv[])
 				if ((found = find_node(account_list, username)))
 				{
 					if (found->status == 1)
-						reply = "1"; // username found
+						strcpy(reply,"1"); // username found
 					else
-						reply = "2"; // username found but has been locked
+						strcpy(reply, "2"); // username found but has been locked
 				}
 				else
-					reply = "0"; // username not found
+					strcpy(reply, "0"); // username not found
 				// echo to client
 				if (0 >= (bytes_sent = send(conn_sock, reply, strlen(reply), 0)))
 				{
 					printf("\nConnection closed 2\n");
 					break;
 				}
+				if(strcmp(reply, "1") != 0)
+					continue;
 
 				
 
@@ -420,9 +425,9 @@ int main(int argc, char const *argv[])
 					// validate password
 					if (0 == strcmp(found->password, password))
 					{
-						memset(&buff, '\0', sizeof(Message));
-						buff = makeQuesList();
-						reply = buff.content;
+						Message buff = makeQuesList();
+						bzero(reply,MAX);
+						strcpy(reply, buff.content);
 						//printf("Đáp án:\n%s\n", buff.answer);
 						if (0 >= (bytes_sent = send(conn_sock, reply, strlen(reply), 0)))
 						{
@@ -439,7 +444,7 @@ int main(int argc, char const *argv[])
 							found->point = n;
 						save_list(account_list, filename);
 						snprintf(point, 3, "%d", n);
-						strcat(bee,point);
+						strcpy(bee,point);
 						strcat(bee,"/10");
 						strcat(bee,"\n\n");
 						lastReq(account_list,bee);

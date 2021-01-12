@@ -558,6 +558,7 @@ void lastReq(node_t *head,char* bufff){
     strcat(bufff,x1);
     strcat(bufff,x2);
     strcat(bufff,x3);
+	// strcat(bufff,"\n");
     // printf("%s\n",bufff);
     return ;
 

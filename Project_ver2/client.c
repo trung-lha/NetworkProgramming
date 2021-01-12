@@ -16,6 +16,18 @@ void Up(char *s)
 		s[i] = s[i] - 32;
 	}
 }
+int validateAnswer(char *ans){
+	char *vali[8] = {"a","b","c","d","A","B","C","D"};
+	if(strlen(ans) != 1){
+		return 0;
+	} else {
+		for(int i=0;i<8;i++){
+			if(strcmp(ans,vali[i]) == 0)
+			return 1;
+		}
+		return 0;
+	}
+}
 int main(int argc, char const *argv[])
 {
 	// valid number of argument
@@ -137,13 +149,17 @@ int main(int argc, char const *argv[])
 				char *ans=(char*)malloc(sizeof(char));
 				printf("%s\n",listQuestions[i]);
 				printf("Đáp án của bạn là: "); scanf("%s", ans);
-				// printf("%s.\n",ans);
+				while(validateAnswer(ans) != 1){
+					printf("Bạn phải nhập đáp án là 1 trong 4 đáp án: [a,b,c,d].\n");
+					printf("Đáp án của bạn là: "); scanf("%s", ans);
+				}
+				// printf("%ld.\n",strlen(ans));
 				strcat(answer,ans);
 			}
 			time(&end);
 			diff_t = (difftime(end, start));
 			int phut = diff_t/60;
-			printf("\n===============================================\nChúc mừng bạn đã hoàn thành bài thi\n===============================================\n");
+			printf("\n===============================================\nChúc mừng bạn đã hoàn thành bộ câu hỏi thi\n===============================================\n");
    			printf("Thời gian làm bài của bạn là: %d phút %.0f giây\n",phut, (diff_t - phut*60));
 			// printf("%s",answer);
 			// scanf("%[^\n]%*c", answer);
@@ -160,6 +176,7 @@ int main(int argc, char const *argv[])
 				return 0;
 			}
 			printf("\nBạn trả lời đúng: %s", buff);
+			printf("\n");
 			break;
 		}
 	}

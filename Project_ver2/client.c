@@ -131,7 +131,7 @@ int main(int argc, char const *argv[])
 			return 0;
 		}
 		else
-		{ // if pass is right
+		{ // if pass is right process response from server, strtok to list question
 			fflush(stdin);
 			int index = 0;
 			char *listQuestions[20];
@@ -153,22 +153,25 @@ int main(int argc, char const *argv[])
 					printf("Bạn phải nhập đáp án là 1 trong 4 đáp án: [a,b,c,d].\n");
 					printf("Đáp án của bạn là: "); scanf("%s", ans);
 				}
-				// printf("%ld.\n",strlen(ans));
 				strcat(answer,ans);
 			}
 			time(&end);
+
+			// show exam time
 			diff_t = (difftime(end, start));
 			int phut = diff_t/60;
 			printf("\n===============================================\nChúc mừng bạn đã hoàn thành bộ câu hỏi thi\n===============================================\n");
    			printf("Thời gian làm bài của bạn là: %d phút %.0f giây\n",phut, (diff_t - phut*60));
-			// printf("%s",answer);
-			// scanf("%[^\n]%*c", answer);
+			
+			//send answer array to server
 			Up(answer);
 			if (0 >= (bytes_sent = send(client_sock, answer, strlen(answer), 0)))
 			{
 				printf("\nConnection closed!\n");
 				return 0;
 			}
+
+			// receive response from server and display
 			memset(buff, 0, 8192);
 			if (0 >= (bytes_received = recv(client_sock, buff, 8192, 0)))
 			{

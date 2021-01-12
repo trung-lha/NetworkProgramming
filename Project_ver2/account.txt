@@ -1,4 +1,4 @@
-trung 12345 1 5
+trung 12345 0 5
 trung1 12345 0 3
 trung2 12345 1 4
 chien1 12345 1 0
